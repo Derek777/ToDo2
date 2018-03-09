@@ -12,18 +12,13 @@
 <h1>ToDo list</h1>
 <div>
     <h3>Список завданнь</h3>
-    <ul>
-        <li>
-            <label><button>
-                <i class="material-icons">check_box_outline_blank</i>
-            </button>
-                some text</label>
-            <button><i class="material-icons">edit</i></button>
-            <button><i class="material-icons">delete</i></button>
-        </li>
+    <ul id="unfinishetTasks">
+
     </ul>
     <h3>Список виконаних завданнь</h3>
-    <ul></ul>
+    <ul id="finishetTasks">
+
+    </ul>
 </div>
 <script src=""></script>
 </body>
@@ -31,3 +26,13 @@
 
 <!--<i class="material-icons">delete</i>-->
 <!--<i class="material-icons">check_box</i>-->
+<template id="template">
+    <li>
+        <label><button>
+            <i class="material-icons">check_box_outline_blank</i>
+        </button>
+            some text</label>
+        <button><i class="material-icons">edit</i></button>
+        <button><i class="material-icons">delete</i></button>
+    </li>
+</template>
