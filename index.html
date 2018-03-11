@@ -10,7 +10,9 @@
 </head>
 <body>
 <h1>ToDo list</h1>
-<div>
+    <input id="new-task" type="text">
+    <button id="add-task">Додати завдання</button>
+<div id="tasks">
     <h3>Список завданнь</h3>
     <ul id="unfinishetTasks">
 
@@ -20,19 +22,21 @@
 
     </ul>
 </div>
-<script src=""></script>
+
+<template id="template">
+    <li class="task">
+        <label><button>
+            <i class="material-icons">check_box_outline_blank</i>
+        </button>
+            some text</label>
+        <button><i class="material-icons editBtn">edit</i></button>
+        <button><i class="material-icons deleteBtn">delete</i></button>
+    </li>
+</template>
+
+<script src="scripts/main.js"></script>
 </body>
 </html>
 
 <!--<i class="material-icons">delete</i>-->
 <!--<i class="material-icons">check_box</i>-->
-<template id="template">
-    <li>
-        <label><button>
-            <i class="material-icons">check_box_outline_blank</i>
-        </button>
-            some text</label>
-        <button><i class="material-icons">edit</i></button>
-        <button><i class="material-icons">delete</i></button>
-    </li>
-</template>
