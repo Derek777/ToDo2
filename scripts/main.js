@@ -1,8 +1,9 @@
 var addButton = document.getElementById('add-task');
 var deleteBtn = document.querySelector('.deleteBtn');
 var inputTask = document.getElementById('new-task');
-var unfinishetTasks = document.getElementById('unfinishetTasks');
-var finishetTasks = document.getElementById('finishetTasks');
+var unfinishedTasks = document.getElementById('unfinishedTasks');
+var finishedTasks = document.getElementById('finishedTasks');
+
 
 
 function Task(text) {
@@ -10,12 +11,13 @@ function Task(text) {
     var clone = template.content.cloneNode(true);
     var val = document.createTextNode(text);
 
-    clone.querySelector('label').appendChild(val);
-    clone.querySelector('.deleteBtn').addEventListener('click', taskList.del);
-
     this.li = clone.querySelector('.task');
-    this.text = clone.querySelector('label').textContent;
+    this.text = text;
+    this.status = false;
 
+    clone.querySelector('label').appendChild(val);
+    clone.querySelector('.deleteBtn').addEventListener('click', taskList.deleteTask.bind(this));
+    clone.querySelector('.checkBtn').addEventListener('click', taskList.checkTask.bind(this));
 }
 
 function TaskList() {
@@ -26,25 +28,47 @@ function TaskList() {
         printTask();
     };
     var printTask = function () {
-        unfinishetTasks.innerHTML = '';
-        var documentFragment = document.createDocumentFragment();
-
+        unfinishedTasks.innerHTML = '';
+        finishedTasks.innerHTML = '';
+        var openTasks = document.createDocumentFragment();
+        var closeTasks = document.createDocumentFragment();
         taskArr.forEach(function(item, i, taskArr) {
-            documentFragment.appendChild(item.li);
+            if(item.status){
+                var elem = document.createElement('ul');
+                elem.appendChild(item.li);
+                elem.querySelector('i').innerText = "check_box";
+                closeTasks.appendChild(elem.firstChild);
+            } else {
+                var elem2 = document.createElement('ul');
+                elem2.appendChild(item.li);
+                elem2.querySelector('i').innerText = "check_box_outline_blank";
+                openTasks.appendChild(elem2.firstChild);
+            }
         });
-
-        unfinishetTasks.appendChild(documentFragment);
+        unfinishedTasks.appendChild(openTasks);
+        finishedTasks.appendChild(closeTasks);
     };
 
-    this.del = function () {
+    var findTask = function (item) {
         for (var i=0; i<taskArr.length; i++){
-            var taskText = this.parentNode.querySelector('label').textContent;
+            var taskText = item.text;
             if(taskText === taskArr[i].text){
-                taskArr.splice(i,1);
-                printTask(taskArr);
+                return i
             }
         }
     };
+
+    this.deleteTask = function () {
+        var taskIndex = findTask(this);
+        taskArr.splice(taskIndex,1);
+        printTask(taskArr);
+    };
+
+    this.checkTask = function () {
+        var num = findTask(this);
+        taskArr[num].status = !taskArr[num].status;
+        printTask();
+    }
 }
 
 function addTask() {
