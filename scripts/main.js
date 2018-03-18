@@ -1,5 +1,6 @@
 var addButton = document.getElementById('add-task');
 var deleteBtn = document.querySelector('.deleteBtn');
+var editBtn = document.getElementById('.editBtn');
 var inputTask = document.getElementById('new-task');
 var unfinishedTasks = document.getElementById('unfinishedTasks');
 var finishedTasks = document.getElementById('finishedTasks');
@@ -18,6 +19,7 @@ function Task(text) {
     clone.querySelector('label').appendChild(val);
     clone.querySelector('.deleteBtn').addEventListener('click', taskList.deleteTask.bind(this));
     clone.querySelector('.checkBtn').addEventListener('click', taskList.checkTask.bind(this));
+    clone.querySelector('.editBtn').addEventListener('click', taskList.editTask.bind(this));
 }
 
 function TaskList() {
@@ -33,20 +35,25 @@ function TaskList() {
         var openTasks = document.createDocumentFragment();
         var closeTasks = document.createDocumentFragment();
         taskArr.forEach(function(item, i, taskArr) {
+            var elem = document.createElement('ul');
+            elem.appendChild(item.li);
+            var editBtn = elem.querySelector('.editBtn');
             if(item.status){
-                var elem = document.createElement('ul');
-                elem.appendChild(item.li);
+                editBtn.classList.add('hidden');
                 elem.querySelector('i').innerText = "check_box";
                 closeTasks.appendChild(elem.firstChild);
             } else {
-                var elem2 = document.createElement('ul');
-                elem2.appendChild(item.li);
-                elem2.querySelector('i').innerText = "check_box_outline_blank";
-                openTasks.appendChild(elem2.firstChild);
+                editBtn.classList.remove('hidden');
+                elem.querySelector('i').innerText = "check_box_outline_blank";
+                openTasks.appendChild(elem.firstChild);
             }
         });
         unfinishedTasks.appendChild(openTasks);
         finishedTasks.appendChild(closeTasks);
+    };
+
+    var isHidden = function (elem) {
+        return  !!elem.querySelector('.hidden');
     };
 
     var findTask = function (item) {
@@ -68,6 +75,10 @@ function TaskList() {
         var num = findTask(this);
         taskArr[num].status = !taskArr[num].status;
         printTask();
+    };
+
+    this.editTask = function () {
+        alert('edit');
     }
 }
 
