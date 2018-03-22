@@ -1,6 +1,7 @@
 var addButton = document.getElementById('add-task');
-var deleteBtn = document.querySelector('.deleteBtn');
-var editBtn = document.getElementById('.editBtn');
+
+// var deleteBtn = document.querySelector('.deleteBtn');
+// var editBtn = document.getElementById('.editBtn');
 var inputTask = document.getElementById('new-task');
 var unfinishedTasks = document.getElementById('unfinishedTasks');
 var finishedTasks = document.getElementById('finishedTasks');
@@ -15,6 +16,7 @@ function Task(text) {
     this.li = clone.querySelector('.task');
     this.text = text;
     this.status = false;
+    this.edit = false;
 
     clone.querySelector('label').appendChild(val);
     clone.querySelector('.deleteBtn').addEventListener('click', taskList.deleteTask.bind(this));
@@ -23,7 +25,7 @@ function Task(text) {
 }
 
 function TaskList() {
-    var taskArr = [];
+    const taskArr = [];
 
     this.newTask = function (task) {
         taskArr.push(task);
@@ -38,22 +40,25 @@ function TaskList() {
             var elem = document.createElement('ul');
             elem.appendChild(item.li);
             var editBtn = elem.querySelector('.editBtn');
+            var label = elem.querySelector('label');
+            var input = elem.querySelector('input');
             if(item.status){
                 editBtn.classList.add('hidden');
                 elem.querySelector('i').innerText = "check_box";
                 closeTasks.appendChild(elem.firstChild);
             } else {
                 editBtn.classList.remove('hidden');
-                elem.querySelector('i').innerText = "check_box_outline_blank";
+                elem.querySelector('.icon').innerText = "check_box_outline_blank";
+                if(item.edit){
+
+                } else {
+
+                }
                 openTasks.appendChild(elem.firstChild);
             }
         });
         unfinishedTasks.appendChild(openTasks);
         finishedTasks.appendChild(closeTasks);
-    };
-
-    var isHidden = function (elem) {
-        return  !!elem.querySelector('.hidden');
     };
 
     var findTask = function (item) {
@@ -68,7 +73,7 @@ function TaskList() {
     this.deleteTask = function () {
         var taskIndex = findTask(this);
         taskArr.splice(taskIndex,1);
-        printTask(taskArr);
+        printTask();
     };
 
     this.checkTask = function () {
@@ -78,7 +83,9 @@ function TaskList() {
     };
 
     this.editTask = function () {
-        alert('edit');
+        var num = findTask(this);
+        taskArr[num].edit = !taskArr[num].edit;
+        printTask()
     }
 }
 

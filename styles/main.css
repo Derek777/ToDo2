@@ -4,4 +4,5 @@ body{
 
 .hidden{
     visibility: hidden;
+    width: 0;
 }
