@@ -61,9 +61,12 @@ function Task(text) {
                 changeClassToVisible.call(self.li, false);
             },
             'save': function () {
-                self.text = self.li.querySelector('.toEdit').value;
+
+                self.text = self.li.querySelector('.toEdit').value || self.text;
+                self.li.querySelector('.toEdit').value = self.text;
                 self.li.querySelector('label').lastChild.textContent = self.text;
                 changeClassToVisible.call(self.li, true);
+
             },
             'default': function () {
                 return true;
@@ -122,7 +125,7 @@ function Task(text) {
     //
     // };
 
-    clone.querySelectorAll('label')[0].appendChild(document.createTextNode(self.text));
+    clone.querySelector('label').appendChild(document.createTextNode(self.text));
     clone.querySelector('.toEdit').value = self.text;
 
 }
