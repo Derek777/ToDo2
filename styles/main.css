@@ -2,7 +2,14 @@ body{
     color: purple;
 }
 
+article {
+    display: none;
+}
+
+.visible{
+    display: inline-block;
+}
+
 .hidden{
     visibility: hidden;
-    width: 0;
 }
