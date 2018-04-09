@@ -22,7 +22,12 @@ function DataService (dataProvider) {
     };
 
     this.save = function () {
-        dataProvider.save(taskList.getTaskArr());
+        try{
+            dataProvider.save(taskList.getTaskArr());
+        } catch (e) {
+            alert("Досягнено ліміт завданнь");
+            window.location.reload();
+        }
     };
 }
 
