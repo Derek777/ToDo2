@@ -1,105 +1,193 @@
 var addButton = document.getElementById('add-task');
-
-// var deleteBtn = document.querySelector('.deleteBtn');
-// var editBtn = document.getElementById('.editBtn');
 var inputTask = document.getElementById('new-task');
 var unfinishedTasks = document.getElementById('unfinishedTasks');
 var finishedTasks = document.getElementById('finishedTasks');
 
+var localStorageProvider = new LocalStorage();
+var dataServiceProvider = new DataService(localStorageProvider);
 
 
-function Task(text) {
+
+function DataService (dataProvider) {
+    this.load = function () {
+        var arrey = dataProvider.load();
+        var tasksArr = [];
+        if(arrey){
+            for (var i=0; i<arrey.length; i++){
+                var taskAfterLoad = new Task(arrey[i].text, arrey[i].status);
+                tasksArr.push(taskAfterLoad);
+            }
+        }
+        taskList.setTaskArr(tasksArr);
+    };
+
+    this.save = function () {
+        dataProvider.save(taskList.getTaskArr());
+    };
+}
+
+function LocalStorage () {
+    this.load = function () {
+        return JSON.parse(localStorage.getItem("ToDo"));
+    };
+
+    this.save = function (arr) {
+        var arrey = [];
+        arr.forEach(function (item, i, arr) {
+            var obj = {
+                text : item.text,
+                status : item.status
+            };
+            arrey.push(obj);
+        });
+        localStorage.setItem('ToDo', JSON.stringify(arrey));
+    };
+}
+
+
+function Task(text, statusAfterLoad) {
     var template = document.querySelector('#template');
     var clone = template.content.cloneNode(true);
-    var val = document.createTextNode(text);
+    var self = this;
+    var changeClassToVisible = function (bool) {
+        if (bool) {
+            this.querySelectorAll('article')[0].classList.add('visible');
+            this.querySelectorAll('article')[1].classList.remove('visible');
+        } else {
+            this.querySelectorAll('article')[0].classList.remove('visible');
+            this.querySelectorAll('article')[1].classList.add('visible');
+        }
+    };
 
     this.li = clone.querySelector('.task');
     this.text = text;
     this.status = false;
-    this.edit = false;
-
-    clone.querySelector('label').appendChild(val);
-    clone.querySelector('.deleteBtn').addEventListener('click', taskList.deleteTask.bind(this));
-    clone.querySelector('.checkBtn').addEventListener('click', taskList.checkTask.bind(this));
-    clone.querySelector('.editBtn').addEventListener('click', taskList.editTask.bind(this));
+    this.li.onclick = function (evemt) {
+        if (evemt.target.tagName === "BUTTON") {
+            var e = new Event("click", {bubbles: true});
+            evemt.target.querySelector('i').dispatchEvent(e);
+            return;
+        }
+        var result;
+        var target = evemt.target.innerText;
+        var targets = {
+            'delete': function () {
+                taskList.deleteTask.call(self);
+                taskList.printTask();
+            },
+            'check_box_outline_blank': function () {
+                if (!self.li.querySelector('article').classList.contains('visible')) {
+                    alert("press save");
+                    return;
+                }
+                changeClassToVisible.call(self.li, true);
+                self.status = true;
+                self.li.querySelector('i').innerText = "check_box";
+                self.li.querySelector('.editBtn').classList.add('hidden');
+                taskList.printTask();
+            },
+            'check_box': function () {
+                self.status = false;
+                self.li.querySelector('i').innerText = "check_box_outline_blank";
+                self.li.querySelector('.editBtn').classList.remove('hidden');
+                taskList.printTask();
+            },
+            'edit': function () {
+                changeClassToVisible.call(self.li, false);
+            },
+            'save': function () {
+                self.text = self.li.querySelector('.toEdit').value || self.text;
+                self.li.querySelector('.toEdit').value = self.text;
+                self.li.querySelector('label').lastChild.textContent = self.text;
+                changeClassToVisible.call(self.li, true);
+            },
+            'default': function () {
+                return true;
+            }
+        };
+        if (targets[target]) {
+            result = targets[target];
+        } else {
+            result = targets['default'];
+        }
+        return result();
+    };
+    if(statusAfterLoad){
+        changeClassToVisible.call(self.li, true);
+        var e = new Event("click", {bubbles: true});
+        this.li.querySelector('button').dispatchEvent(e);
+    }
+    changeClassToVisible.call(self.li, true);
+    clone.querySelector('label' ).appendChild(document.createTextNode(self.text));
+    clone.querySelector('.toEdit').value = self.text;
 }
 
 function TaskList() {
-    const taskArr = [];
+    var taskArr = [];
 
-    this.newTask = function (task) {
-        taskArr.push(task);
-        printTask();
+    this.getTaskArr = function () {
+      return taskArr;
     };
-    var printTask = function () {
+
+    this.setTaskArr = function (arr) {
+        taskArr = arr;
+    };
+
+    var print = function (openTasks, closeTasks) {
         unfinishedTasks.innerHTML = '';
         finishedTasks.innerHTML = '';
-        var openTasks = document.createDocumentFragment();
-        var closeTasks = document.createDocumentFragment();
-        taskArr.forEach(function(item, i, taskArr) {
-            var elem = document.createElement('ul');
-            elem.appendChild(item.li);
-            var editBtn = elem.querySelector('.editBtn');
-            var label = elem.querySelector('label');
-            var input = elem.querySelector('input');
-            if(item.status){
-                editBtn.classList.add('hidden');
-                elem.querySelector('i').innerText = "check_box";
-                closeTasks.appendChild(elem.firstChild);
-            } else {
-                editBtn.classList.remove('hidden');
-                elem.querySelector('.icon').innerText = "check_box_outline_blank";
-                if(item.edit){
-
-                } else {
-
-                }
-                openTasks.appendChild(elem.firstChild);
-            }
-        });
         unfinishedTasks.appendChild(openTasks);
         finishedTasks.appendChild(closeTasks);
     };
 
     var findTask = function (item) {
-        for (var i=0; i<taskArr.length; i++){
+        for (var i = 0; i < taskArr.length; i++) {
             var taskText = item.text;
-            if(taskText === taskArr[i].text){
+            if (taskText === taskArr[i].text) {
                 return i
             }
         }
     };
 
+    this.newTask = function (task) {
+        task.li.querySelector('article').classList.add('visible');
+        taskArr.push(task);
+    };
+
+    this.printTask = function () {
+        var openTasks = document.createDocumentFragment();
+        var closeTasks = document.createDocumentFragment();
+        taskArr.forEach(function (item) {
+            if (item.status) {
+                closeTasks.appendChild(item.li);
+            } else {
+                openTasks.appendChild(item.li);
+            }
+        });
+        dataServiceProvider.save();
+        print(openTasks, closeTasks);
+    };
+
     this.deleteTask = function () {
         var taskIndex = findTask(this);
-        taskArr.splice(taskIndex,1);
-        printTask();
+        taskArr.splice(taskIndex, 1);
     };
-
-    this.checkTask = function () {
-        var num = findTask(this);
-        taskArr[num].status = !taskArr[num].status;
-        printTask();
-    };
-
-    this.editTask = function () {
-        var num = findTask(this);
-        taskArr[num].edit = !taskArr[num].edit;
-        printTask()
-    }
 }
 
 function addTask() {
-    if (inputTask.value){
-        var taskItem = new Task(inputTask.value);
+    if (inputTask.value) {
+        var taskItem = new Task(inputTask.value, false);
         taskList.newTask(taskItem);
         inputTask.value = "";
+        taskList.printTask();
     } else {
         alert("no text");
     }
 }
 
 var taskList = new TaskList();
+dataServiceProvider.load();
+taskList.printTask();
 addButton.onclick = addTask;
 
 

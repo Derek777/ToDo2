@@ -1,4 +1,4 @@
-body{
+body {
     color: purple;
 }
 
@@ -6,10 +6,14 @@ article {
     display: none;
 }
 
-.visible{
+.visible {
     display: inline-block;
 }
 
-.hidden{
+.hidden {
     visibility: hidden;
+}
+
+#finishedTasks label {
+    text-decoration: line-through;
 }
